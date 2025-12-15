@@ -4,6 +4,9 @@ import pandas as pd
 from schemas import HouseInput
 from sklearn.preprocessing import *
 from sklearn.compose import ColumnTransformer
+from fastapi import HTTPException
+import traceback
+
 
 app = FastAPI(
     title="House Price Prediction API",
@@ -14,8 +17,6 @@ app = FastAPI(
 model = joblib.load("house_price_model.pkl")
 print(model.n_features_in_)
 
-preprocessor=joblib.load("preprocessor.pkl")
-print(preprocessor.n_features_in_)
 
 @app.get("/")
 def home():
@@ -23,28 +24,31 @@ def home():
 
 @app.post("/predict")
 def predict_price(data: HouseInput):
-    df = pd.DataFrame([{
-        "area": data.area,
-        "bedrooms": data.bedrooms,
-        "bathrooms": data.bathrooms,
-        "stories": data.stories,
-        "mainroad": data.mainroad,
-        "guestroom": data.guestroom,
-        "basement": data.basement,
-        "hotwaterheating": data.hotwaterheating,
-        "airconditioning": data.airconditioning,
-        "parking": data.parking,
-        "prefarea": data.prefarea,
-        "furnishingstatus": data.furnishingstatus,
-        "location_type": data.location_type,
-        "base_ppsf": data.base_ppsf
-    }])
+    try:
+        df = pd.DataFrame([{
+            "area": data.area,
+            "bedrooms": data.bedrooms,
+            "bathrooms": data.bathrooms,
+            "stories": data.stories,
+            "mainroad": data.mainroad,
+            "guestroom": data.guestroom,
+            "basement": data.basement,
+            "hotwaterheating": data.hotwaterheating,
+            "airconditioning": data.airconditioning,
+            "parking": data.parking,
+            "prefarea": data.prefarea,
+            "furnishingstatus": data.furnishingstatus,
+            "location_type": data.location_type,
+            "base_ppsf": data.base_ppsf
+        }])
     
-    df = df[preprocessor.feature_names_in_]
     
-    new_df=preprocessor.transform(df)
 
     
-    prediction = model.predict(new_df)[0]
+        prediction = model.predict(df)[0]
 
-    return {"predicted_price": round(float(prediction), 2)}
+        return {"predicted_price": round(float(prediction), 2)}
+    
+    except Exception as e:
+        traceback.print_exc()  # 🔥 shows real error in Render logs
+        raise HTTPException(status_code=500, detail=str(e))
