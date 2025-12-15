@@ -14,6 +14,9 @@ app = FastAPI(
 model = joblib.load("house_price_model.pkl")
 print(model.n_features_in_)
 
+preprocessor=joblib.load("preprocessor.pkl")
+print(preprocessor.n_features_in_)
+
 @app.get("/")
 def home():
     return {"message": "House Price Prediction API running"}
@@ -36,8 +39,12 @@ def predict_price(data: HouseInput):
         "location_type": data.location_type,
         "base_ppsf": data.base_ppsf
     }])
+    
+    df = df[preprocessor.feature_names_in_]
+    
+    new_df=preprocessor.transform(df)
 
     
-    prediction = model.predict(df)[0]
+    prediction = model.predict(new_df)[0]
 
     return {"predicted_price": round(float(prediction), 2)}
