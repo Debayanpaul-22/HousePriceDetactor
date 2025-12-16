@@ -30,15 +30,15 @@ def predict_price(data: HouseInput):
             "bedrooms": data.bedrooms,
             "bathrooms": data.bathrooms,
             "stories": data.stories,
-            "mainroad": data.mainroad,
-            "guestroom": data.guestroom,
-            "basement": data.basement,
-            "hotwaterheating": data.hotwaterheating,
-            "airconditioning": data.airconditioning,
+            "mainroad": data.mainroad.lower(),
+            "guestroom": data.guestroom.lower(),
+            "basement": data.basement.lower(),
+            "hotwaterheating": data.hotwaterheating.lower(),
+            "airconditioning": data.airconditioning.lower(),
             "parking": data.parking,
-            "prefarea": data.prefarea,
-            "furnishingstatus": data.furnishingstatus,
-            "location_type": data.location_type,
+            "prefarea": data.prefarea.lower(),
+            "furnishingstatus": data.furnishingstatus.lower(),
+            "location_type": data.location_type.lower(),
             "base_ppsf": data.base_ppsf
         }])
     
